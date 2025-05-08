@@ -18,7 +18,7 @@
     </div>
 
     <!-- Profile Form -->
-    <form id="profileForm" class="bg-white p-6 rounded shadow mb-8 hidden">
+    <form id="profileForm" class="bg-white p-6 rounded shadow mb-4 hidden">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input type="text" placeholder="College Year" id="year" class="border p-2 rounded" required />
         <input type="text" placeholder="Division" id="division" class="border p-2 rounded" required />
@@ -29,6 +29,7 @@
         <input type="text" placeholder="Experience" id="experience" class="border p-2 rounded" required />
       </div>
       <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit</button>
+      <button type="button" onclick="logoutUser()" class="mt-4 ml-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
     </form>
 
     <!-- Profiles Display -->
@@ -48,6 +49,7 @@
     if (currentUser) {
       loginSection.style.display = 'none';
       profileForm.classList.remove('hidden');
+      populateForm();
       renderProfiles();
     }
 
@@ -58,7 +60,27 @@
         localStorage.setItem('currentUser', currentUser);
         loginSection.style.display = 'none';
         profileForm.classList.remove('hidden');
+        populateForm();
         renderProfiles();
+      }
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('currentUser');
+      loginSection.style.display = 'block';
+      profileForm.classList.add('hidden');
+    }
+
+    function populateForm() {
+      const existing = users.find(u => u.name === currentUser);
+      if (existing) {
+        document.getElementById('year').value = existing.year;
+        document.getElementById('division').value = existing.division;
+        document.getElementById('roll').value = existing.roll;
+        document.getElementById('contact').value = existing.contact;
+        document.getElementById('interests').value = existing.interests.join(', ');
+        document.getElementById('expertise').value = existing.expertise;
+        document.getElementById('experience').value = existing.experience;
       }
     }
 
@@ -77,10 +99,15 @@
         experience: document.getElementById('experience').value,
       };
 
-      users.push(user);
+      const existingIndex = users.findIndex(u => u.name === currentUser);
+      if (existingIndex >= 0) {
+        users[existingIndex] = user;
+      } else {
+        users.push(user);
+      }
       localStorage.setItem('users', JSON.stringify(users));
       renderProfiles();
-      form.reset();
+      populateForm();
     });
 
     function renderProfiles() {
