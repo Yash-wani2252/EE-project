@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>College Connect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-4">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-center">College Connect</h1>
+
+    <!-- Profile Form -->
+    <form id="profileForm" class="bg-white p-6 rounded shadow mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" placeholder="Name" id="name" class="border p-2 rounded" required />
+        <input type="text" placeholder="College Year" id="year" class="border p-2 rounded" required />
+        <input type="text" placeholder="Division" id="division" class="border p-2 rounded" required />
+        <input type="text" placeholder="Roll Number" id="roll" class="border p-2 rounded" required />
+        <input type="text" placeholder="Contact Number" id="contact" class="border p-2 rounded" required />
+        <input type="text" placeholder="Interests (comma separated)" id="interests" class="border p-2 rounded" required />
+        <input type="text" placeholder="Expertise" id="expertise" class="border p-2 rounded" required />
+        <input type="text" placeholder="Experience" id="experience" class="border p-2 rounded" required />
+      </div>
+      <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit</button>
+    </form>
+
+    <!-- Profiles Display -->
+    <h2 class="text-xl font-semibold mb-4">User Profiles</h2>
+    <div id="profiles" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('profileForm');
+    const profilesContainer = document.getElementById('profiles');
+    let users = [];
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const user = {
+        name: document.getElementById('name').value,
+        year: document.getElementById('year').value,
+        division: document.getElementById('division').value,
+        roll: document.getElementById('roll').value,
+        contact: document.getElementById('contact').value,
+        interests: document.getElementById('interests').value.toLowerCase().split(',').map(i => i.trim()),
+        expertise: document.getElementById('expertise').value,
+        experience: document.getElementById('experience').value,
+      };
+
+      users.push(user);
+      renderProfiles();
+      form.reset();
+    });
+
+    function renderProfiles() {
+      profilesContainer.innerHTML = '';
+      users.forEach((user, index) => {
+        const recommendations = users.filter((u, i) => i !== index && u.interests.some(interest => user.interests.includes(interest)));
+
+        const div = document.createElement('div');
+        div.className = 'p-4 bg-white rounded shadow';
+        div.innerHTML = `
+          <h3 class="text-lg font-bold">${user.name}</h3>
+          <p><strong>Year:</strong> ${user.year}</p>
+          <p><strong>Division:</strong> ${user.division}</p>
+          <p><strong>Roll No:</strong> ${user.roll}</p>
+          <p><strong>Contact:</strong> ${user.contact}</p>
+          <p><strong>Interests:</strong> ${user.interests.join(', ')}</p>
+          <p><strong>Expertise:</strong> ${user.expertise}</p>
+          <p><strong>Experience:</strong> ${user.experience}</p>
+          <p class="mt-2 text-sm text-gray-600">Matches with: ${recommendations.map(r => r.name).join(', ') || 'No matches yet'}</p>
+        `;
+        profilesContainer.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
