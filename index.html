@@ -10,10 +10,16 @@
   <div class="max-w-4xl mx-auto">
     <h1 class="text-3xl font-bold mb-6 text-center">College Connect</h1>
 
+    <!-- Login Form -->
+    <div id="loginSection" class="bg-white p-6 rounded shadow mb-8">
+      <h2 class="text-xl font-semibold mb-2">Login</h2>
+      <input type="text" id="loginName" placeholder="Enter your name to login" class="border p-2 rounded w-full mb-2" />
+      <button onclick="loginUser()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Login</button>
+    </div>
+
     <!-- Profile Form -->
-    <form id="profileForm" class="bg-white p-6 rounded shadow mb-8">
+    <form id="profileForm" class="bg-white p-6 rounded shadow mb-8 hidden">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="text" placeholder="Name" id="name" class="border p-2 rounded" required />
         <input type="text" placeholder="College Year" id="year" class="border p-2 rounded" required />
         <input type="text" placeholder="Division" id="division" class="border p-2 rounded" required />
         <input type="text" placeholder="Roll Number" id="roll" class="border p-2 rounded" required />
@@ -31,15 +37,37 @@
   </div>
 
   <script>
-    const form = document.getElementById('profileForm');
+    const loginSection = document.getElementById('loginSection');
+    const profileForm = document.getElementById('profileForm');
     const profilesContainer = document.getElementById('profiles');
-    let users = [];
+    const loginNameInput = document.getElementById('loginName');
 
+    let currentUser = localStorage.getItem('currentUser') || null;
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+
+    if (currentUser) {
+      loginSection.style.display = 'none';
+      profileForm.classList.remove('hidden');
+      renderProfiles();
+    }
+
+    function loginUser() {
+      const name = loginNameInput.value.trim();
+      if (name) {
+        currentUser = name;
+        localStorage.setItem('currentUser', currentUser);
+        loginSection.style.display = 'none';
+        profileForm.classList.remove('hidden');
+        renderProfiles();
+      }
+    }
+
+    const form = document.getElementById('profileForm');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
       const user = {
-        name: document.getElementById('name').value,
+        name: currentUser,
         year: document.getElementById('year').value,
         division: document.getElementById('division').value,
         roll: document.getElementById('roll').value,
@@ -50,6 +78,7 @@
       };
 
       users.push(user);
+      localStorage.setItem('users', JSON.stringify(users));
       renderProfiles();
       form.reset();
     });
