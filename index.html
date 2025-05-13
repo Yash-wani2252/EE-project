@@ -1,269 +1,240 @@
-<!-- Same head as before -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>College Connect</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 p-4">
+<body class="bg-gray-100 p-4">
   <div class="max-w-5xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-center">College Connect</h1>
+    <h1 class="text-3xl font-bold text-center mb-6">College Connect</h1>
 
-    <!-- Login Section -->
+    <!-- Login -->
     <div id="loginSection" class="bg-white p-6 rounded shadow mb-8">
       <h2 class="text-xl font-semibold mb-2">Login</h2>
-      <input type="text" id="loginName" placeholder="Enter full name (Name Father's Name Surname)" class="border p-2 rounded w-full mb-2" />
-      <select id="loginRole" class="border p-2 rounded w-full mb-2">
-        <option value="">Select Role</option>
+      <select id="userType" class="border p-2 rounded w-full mb-2">
         <option value="student">Student</option>
         <option value="staff">Staff</option>
       </select>
-      <button onclick="loginUser()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Login</button>
+      <input type="text" id="loginName" placeholder="Full Name (with Father's name if student)" class="border p-2 rounded w-full mb-2" />
+      <button onclick="loginUser()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Login</button>
     </div>
 
-    <!-- Student Form -->
-    <form id="studentForm" class="bg-white p-6 rounded shadow mb-4 hidden">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="text" placeholder="Mother's Name" id="mother" class="border p-2 rounded" required />
+    <!-- Search -->
+    <div class="mb-4">
+      <input type="text" id="searchInput" placeholder="Search by name, branch, department..." class="border p-2 rounded w-full" oninput="renderProfiles()" />
+    </div>
+
+    <!-- Profile Form -->
+    <form id="profileForm" class="bg-white p-6 rounded shadow mb-8 hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="studentFields">
         <input type="text" placeholder="College Year" id="year" class="border p-2 rounded" required />
         <input type="text" placeholder="Division" id="division" class="border p-2 rounded" required />
         <input type="text" placeholder="Roll Number" id="roll" class="border p-2 rounded" required />
         <input type="text" placeholder="Contact Number" id="contact" class="border p-2 rounded" required />
+        <input type="text" placeholder="Mother's Name" id="mother" class="border p-2 rounded" required />
         <select id="branch" class="border p-2 rounded" required>
-          <option value="">Select Branch</option>
-          <option value="Civil Engineering">Civil Engineering</option>
-          <option value="Computer Engineering">Computer Engineering</option>
+          <option value="Civil">Civil Engineering</option>
+          <option value="Computer">Computer Engineering</option>
         </select>
         <input type="text" placeholder="Interests (comma separated)" id="interests" class="border p-2 rounded" required />
         <input type="text" placeholder="Expertise" id="expertise" class="border p-2 rounded" required />
         <input type="text" placeholder="Experience" id="experience" class="border p-2 rounded" required />
       </div>
-      <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit</button>
-      <button type="button" onclick="logoutUser()" class="mt-4 ml-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
-    </form>
 
-    <!-- Staff Form -->
-    <form id="staffForm" class="bg-white p-6 rounded shadow mb-4 hidden">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="text" placeholder="Expertise" id="staffExpertise" class="border p-2 rounded" required />
-        <input type="text" placeholder="Field of Research" id="research" class="border p-2 rounded" required />
-        <input type="text" placeholder="Sitting Location" id="sitting" class="border p-2 rounded" required />
-        <input type="text" placeholder="Department" id="department" class="border p-2 rounded" required />
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="staffFields" style="display: none;">
+        <input type="text" placeholder="Expertise" id="staffExpertise" class="border p-2 rounded" />
+        <input type="text" placeholder="Field of Research" id="staffResearch" class="border p-2 rounded" />
+        <input type="text" placeholder="Sitting Location" id="staffLocation" class="border p-2 rounded" />
+        <input type="text" placeholder="Department" id="staffDepartment" class="border p-2 rounded" />
+        <input type="text" placeholder="Phone Number" id="staffPhone" class="border p-2 rounded" />
       </div>
-      <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit</button>
-      <button type="button" onclick="logoutUser()" class="mt-4 ml-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+
+      <div class="mt-4">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Profile</button>
+        <button type="button" onclick="logoutUser()" class="ml-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Logout</button>
+      </div>
     </form>
 
-    <!-- Search Bar -->
-    <div class="mb-4">
-      <input type="text" id="searchInput" oninput="renderProfiles()" placeholder="Search by name, branch or role..." class="border p-2 w-full rounded shadow-sm" />
-    </div>
-
-    <!-- Profiles Section -->
-    <h2 class="text-xl font-semibold mb-4">User Profiles</h2>
+    <!-- Profiles -->
+    <h2 class="text-xl font-semibold mb-4">All Profiles</h2>
     <div id="profiles" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
   </div>
 
   <script>
     const loginSection = document.getElementById('loginSection');
-    const studentForm = document.getElementById('studentForm');
-    const staffForm = document.getElementById('staffForm');
-    const profilesContainer = document.getElementById('profiles');
+    const profileForm = document.getElementById('profileForm');
     const loginNameInput = document.getElementById('loginName');
-    const loginRoleInput = document.getElementById('loginRole');
+    const userTypeSelect = document.getElementById('userType');
+    const profilesContainer = document.getElementById('profiles');
     const searchInput = document.getElementById('searchInput');
 
+    const studentFields = document.getElementById('studentFields');
+    const staffFields = document.getElementById('staffFields');
+
     let currentUser = localStorage.getItem('currentUser') || null;
-    let currentRole = localStorage.getItem('currentRole') || null;
     let users = JSON.parse(localStorage.getItem('users')) || [];
 
     if (currentUser) {
       loginSection.style.display = 'none';
-      showForm();
-      populateForm();
+      profileForm.classList.remove('hidden');
       renderProfiles();
+      populateForm();
     }
+
+    userTypeSelect.addEventListener('change', () => {
+      if (userTypeSelect.value === 'staff') {
+        staffFields.style.display = 'grid';
+        studentFields.style.display = 'none';
+      } else {
+        studentFields.style.display = 'grid';
+        staffFields.style.display = 'none';
+      }
+    });
 
     function loginUser() {
       const name = loginNameInput.value.trim();
-      const role = loginRoleInput.value;
-
-      if (!/^\w+\s\w+\s\w+$/.test(name)) {
-        alert("Please enter your full name in the format: Name Father's Name Surname");
-        return;
-      }
-
-      if (!role) {
-        alert("Please select a role");
-        return;
-      }
+      if (!name) return alert("Please enter your full name.");
 
       currentUser = name;
-      currentRole = role;
       localStorage.setItem('currentUser', currentUser);
-      localStorage.setItem('currentRole', currentRole);
       loginSection.style.display = 'none';
-      showForm();
+      profileForm.classList.remove('hidden');
       populateForm();
       renderProfiles();
     }
 
     function logoutUser() {
       localStorage.removeItem('currentUser');
-      localStorage.removeItem('currentRole');
-      location.reload();
-    }
-
-    function showForm() {
-      if (currentRole === 'staff') {
-        staffForm.classList.remove('hidden');
-      } else {
-        studentForm.classList.remove('hidden');
-      }
+      currentUser = null;
+      loginSection.style.display = 'block';
+      profileForm.classList.add('hidden');
     }
 
     function populateForm() {
-      const user = users.find(u => u.name === currentUser);
-      if (!user) return;
+      const existing = users.find(u => u.name === currentUser);
+      if (!existing) return;
 
-      if (currentRole === 'staff') {
-        document.getElementById('staffExpertise').value = user.expertise || "";
-        document.getElementById('research').value = user.research || "";
-        document.getElementById('sitting').value = user.sitting || "";
-        document.getElementById('department').value = user.department || "";
+      if (existing.userType === 'staff') {
+        userTypeSelect.value = 'staff';
+        userTypeSelect.dispatchEvent(new Event('change'));
+        document.getElementById('staffExpertise').value = existing.expertise;
+        document.getElementById('staffResearch').value = existing.research;
+        document.getElementById('staffLocation').value = existing.location;
+        document.getElementById('staffDepartment').value = existing.department;
+        document.getElementById('staffPhone').value = existing.phone;
       } else {
-        document.getElementById('mother').value = user.mother || "";
-        document.getElementById('year').value = user.year || "";
-        document.getElementById('division').value = user.division || "";
-        document.getElementById('roll').value = user.roll || "";
-        document.getElementById('contact').value = user.contact || "";
-        document.getElementById('interests').value = user.interests?.join(', ') || "";
-        document.getElementById('expertise').value = user.expertise || "";
-        document.getElementById('experience').value = user.experience || "";
-        document.getElementById('branch').value = user.branch || "";
+        userTypeSelect.value = 'student';
+        userTypeSelect.dispatchEvent(new Event('change'));
+        document.getElementById('year').value = existing.year;
+        document.getElementById('division').value = existing.division;
+        document.getElementById('roll').value = existing.roll;
+        document.getElementById('contact').value = existing.contact;
+        document.getElementById('mother').value = existing.mother;
+        document.getElementById('branch').value = existing.branch;
+        document.getElementById('interests').value = existing.interests.join(', ');
+        document.getElementById('expertise').value = existing.expertise;
+        document.getElementById('experience').value = existing.experience;
       }
     }
 
-    studentForm.addEventListener('submit', function (e) {
+    document.getElementById('profileForm').addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const user = {
-        name: currentUser,
-        role: 'student',
-        mother: document.getElementById('mother').value,
-        year: document.getElementById('year').value,
-        division: document.getElementById('division').value,
-        roll: document.getElementById('roll').value,
-        contact: document.getElementById('contact').value,
-        interests: document.getElementById('interests').value.toLowerCase().split(',').map(i => i.trim()),
-        expertise: document.getElementById('expertise').value,
-        experience: document.getElementById('experience').value,
-        branch: document.getElementById('branch').value
-      };
+      const userType = userTypeSelect.value;
+      let user;
 
-      saveUser(user);
-    });
+      if (userType === 'staff') {
+        user = {
+          userType,
+          name: currentUser,
+          expertise: document.getElementById('staffExpertise').value,
+          research: document.getElementById('staffResearch').value,
+          location: document.getElementById('staffLocation').value,
+          department: document.getElementById('staffDepartment').value,
+          phone: document.getElementById('staffPhone').value
+        };
+      } else {
+        user = {
+          userType,
+          name: currentUser,
+          year: document.getElementById('year').value,
+          division: document.getElementById('division').value,
+          roll: document.getElementById('roll').value,
+          contact: document.getElementById('contact').value,
+          mother: document.getElementById('mother').value,
+          branch: document.getElementById('branch').value,
+          interests: document.getElementById('interests').value.toLowerCase().split(',').map(i => i.trim()),
+          expertise: document.getElementById('expertise').value,
+          experience: document.getElementById('experience').value
+        };
+      }
 
-    staffForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      const user = {
-        name: currentUser,
-        role: 'staff',
-        expertise: document.getElementById('staffExpertise').value,
-        research: document.getElementById('research').value,
-        sitting: document.getElementById('sitting').value,
-        department: document.getElementById('department').value
-      };
-
-      saveUser(user);
-    });
-
-    function saveUser(user) {
       const index = users.findIndex(u => u.name === currentUser);
-      if (index >= 0) users[index] = user;
-      else users.push(user);
-
+      if (index >= 0) {
+        users[index] = user;
+      } else {
+        users.push(user);
+      }
       localStorage.setItem('users', JSON.stringify(users));
       renderProfiles();
-    }
-
-    function deleteUser(name) {
-      if (!confirm("Are you sure you want to delete this profile?")) return;
-
-      users = users.filter(u => u.name !== name);
-      if (name === currentUser) logoutUser();
-      else {
-        localStorage.setItem('users', JSON.stringify(users));
-        renderProfiles();
-      }
-    }
-
-    function editUser(name) {
-      const user = users.find(u => u.name === name);
-      if (!user) return;
-
-      currentUser = user.name;
-      currentRole = user.role;
-      localStorage.setItem('currentUser', currentUser);
-      localStorage.setItem('currentRole', currentRole);
-      location.reload();
-    }
+    });
 
     function renderProfiles() {
-      const query = searchInput.value.toLowerCase();
       profilesContainer.innerHTML = '';
+      const keyword = searchInput.value.toLowerCase();
 
-      users
-        .filter(user =>
-          user.name.toLowerCase().includes(query) ||
-          (user.branch?.toLowerCase() || '').includes(query) ||
-          user.role.toLowerCase().includes(query)
-        )
-        .forEach(user => {
-          const div = document.createElement('div');
-          div.className = `p-4 rounded shadow border relative ${
-            user.role === 'staff' ? 'bg-yellow-100 border-yellow-400' : 'bg-white'
-          }`;
+      users.filter(user => {
+        return user.name.toLowerCase().includes(keyword)
+          || (user.branch && user.branch.toLowerCase().includes(keyword))
+          || (user.department && user.department.toLowerCase().includes(keyword));
+      }).forEach(user => {
+        const div = document.createElement('div');
+        div.className = `p-4 rounded shadow ${user.userType === 'staff' ? 'bg-yellow-100' : 'bg-white'}`;
+        div.innerHTML = `<h3 class="font-bold text-lg">${user.name}</h3>`;
 
-          if (user.role === 'staff') {
-            div.innerHTML = `
-              <h3 class="text-lg font-bold">${user.name}</h3>
-              <p><strong>Role:</strong> ${user.role}</p>
-              <p><strong>Expertise:</strong> ${user.expertise}</p>
-              <p><strong>Field of Research:</strong> ${user.research}</p>
-              <p><strong>Sitting Location:</strong> ${user.sitting}</p>
-              <p><strong>Department:</strong> ${user.department}</p>
-            `;
-          } else {
-            div.innerHTML = `
-              <h3 class="text-lg font-bold">${user.name}</h3>
-              <p><strong>Mother's Name:</strong> ${user.mother}</p>
-              <p><strong>Year:</strong> ${user.year}</p>
-              <p><strong>Division:</strong> ${user.division}</p>
-              <p><strong>Roll No:</strong> ${user.roll}</p>
-              <p><strong>Contact:</strong> ${user.contact}</p>
-              <p><strong>Branch:</strong> ${user.branch}</p>
-              <p><strong>Role:</strong> ${user.role}</p>
-              <p><strong>Interests:</strong> ${user.interests?.join(', ')}</p>
-              <p><strong>Expertise:</strong> ${user.expertise}</p>
-              <p><strong>Experience:</strong> ${user.experience}</p>
-            `;
-          }
+        if (user.userType === 'staff') {
+          div.innerHTML += `
+            <p><strong>Expertise:</strong> ${user.expertise}</p>
+            <p><strong>Field of Research:</strong> ${user.research}</p>
+            <p><strong>Location:</strong> ${user.location}</p>
+            <p><strong>Department:</strong> ${user.department}</p>
+            <p><strong>Phone:</strong> ${user.phone}</p>
+          `;
+        } else {
+          div.innerHTML += `
+            <p><strong>Year:</strong> ${user.year}</p>
+            <p><strong>Division:</strong> ${user.division}</p>
+            <p><strong>Roll No:</strong> ${user.roll}</p>
+            <p><strong>Contact:</strong> ${user.contact}</p>
+            <p><strong>Mother's Name:</strong> ${user.mother}</p>
+            <p><strong>Branch:</strong> ${user.branch}</p>
+            <p><strong>Interests:</strong> ${user.interests.join(', ')}</p>
+            <p><strong>Expertise:</strong> ${user.expertise}</p>
+            <p><strong>Experience:</strong> ${user.experience}</p>
+          `;
+        }
 
-          if (user.name === currentUser) {
-            div.innerHTML += `
-              <div class="mt-4 flex gap-2">
-                <button onclick="editUser('${user.name}')" class="bg-green-500 text-white px-3 py-1 rounded">Edit</button>
-                <button onclick="deleteUser('${user.name}')" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
-              </div>
-            `;
-          }
+        if (user.name === currentUser) {
+          div.innerHTML += `
+            <div class="mt-2">
+              <button onclick="deleteProfile('${user.name}')" class="text-sm text-red-600 hover:underline">Delete</button>
+            </div>`;
+        }
 
-          profilesContainer.appendChild(div);
-        });
+        profilesContainer.appendChild(div);
+      });
+    }
+
+    function deleteProfile(name) {
+      if (!confirm("Are you sure you want to delete this profile?")) return;
+      users = users.filter(u => u.name !== name);
+      if (currentUser === name) {
+        logoutUser();
+      }
+      localStorage.setItem('users', JSON.stringify(users));
+      renderProfiles();
     }
   </script>
 </body>
