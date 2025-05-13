@@ -1,3 +1,4 @@
+<!-- Same head as before -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,15 +11,20 @@
   <div class="max-w-5xl mx-auto">
     <h1 class="text-3xl font-bold mb-6 text-center">College Connect</h1>
 
-    <!-- Login -->
+    <!-- Login Section -->
     <div id="loginSection" class="bg-white p-6 rounded shadow mb-8">
       <h2 class="text-xl font-semibold mb-2">Login</h2>
       <input type="text" id="loginName" placeholder="Enter full name (Name Father's Name Surname)" class="border p-2 rounded w-full mb-2" />
+      <select id="loginRole" class="border p-2 rounded w-full mb-2">
+        <option value="">Select Role</option>
+        <option value="student">Student</option>
+        <option value="staff">Staff</option>
+      </select>
       <button onclick="loginUser()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Login</button>
     </div>
 
-    <!-- Profile -->
-    <form id="profileForm" class="bg-white p-6 rounded shadow mb-4 hidden">
+    <!-- Student Form -->
+    <form id="studentForm" class="bg-white p-6 rounded shadow mb-4 hidden">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input type="text" placeholder="Mother's Name" id="mother" class="border p-2 rounded" required />
         <input type="text" placeholder="College Year" id="year" class="border p-2 rounded" required />
@@ -30,13 +36,21 @@
           <option value="Civil Engineering">Civil Engineering</option>
           <option value="Computer Engineering">Computer Engineering</option>
         </select>
-        <select id="role" class="border p-2 rounded" required>
-          <option value="student">Student</option>
-          <option value="staff">Staff</option>
-        </select>
         <input type="text" placeholder="Interests (comma separated)" id="interests" class="border p-2 rounded" required />
         <input type="text" placeholder="Expertise" id="expertise" class="border p-2 rounded" required />
         <input type="text" placeholder="Experience" id="experience" class="border p-2 rounded" required />
+      </div>
+      <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit</button>
+      <button type="button" onclick="logoutUser()" class="mt-4 ml-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+    </form>
+
+    <!-- Staff Form -->
+    <form id="staffForm" class="bg-white p-6 rounded shadow mb-4 hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" placeholder="Expertise" id="staffExpertise" class="border p-2 rounded" required />
+        <input type="text" placeholder="Field of Research" id="research" class="border p-2 rounded" required />
+        <input type="text" placeholder="Sitting Location" id="sitting" class="border p-2 rounded" required />
+        <input type="text" placeholder="Department" id="department" class="border p-2 rounded" required />
       </div>
       <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit</button>
       <button type="button" onclick="logoutUser()" class="mt-4 ml-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
@@ -47,69 +61,97 @@
       <input type="text" id="searchInput" oninput="renderProfiles()" placeholder="Search by name, branch or role..." class="border p-2 w-full rounded shadow-sm" />
     </div>
 
-    <!-- Profiles Display -->
+    <!-- Profiles Section -->
     <h2 class="text-xl font-semibold mb-4">User Profiles</h2>
     <div id="profiles" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
   </div>
 
   <script>
     const loginSection = document.getElementById('loginSection');
-    const profileForm = document.getElementById('profileForm');
+    const studentForm = document.getElementById('studentForm');
+    const staffForm = document.getElementById('staffForm');
     const profilesContainer = document.getElementById('profiles');
     const loginNameInput = document.getElementById('loginName');
+    const loginRoleInput = document.getElementById('loginRole');
     const searchInput = document.getElementById('searchInput');
 
     let currentUser = localStorage.getItem('currentUser') || null;
+    let currentRole = localStorage.getItem('currentRole') || null;
     let users = JSON.parse(localStorage.getItem('users')) || [];
 
     if (currentUser) {
       loginSection.style.display = 'none';
-      profileForm.classList.remove('hidden');
+      showForm();
       populateForm();
       renderProfiles();
     }
 
     function loginUser() {
       const name = loginNameInput.value.trim();
-      if (/^\w+\s\w+\s\w+$/.test(name)) {
-        currentUser = name;
-        localStorage.setItem('currentUser', currentUser);
-        loginSection.style.display = 'none';
-        profileForm.classList.remove('hidden');
-        populateForm();
-        renderProfiles();
-      } else {
+      const role = loginRoleInput.value;
+
+      if (!/^\w+\s\w+\s\w+$/.test(name)) {
         alert("Please enter your full name in the format: Name Father's Name Surname");
+        return;
       }
+
+      if (!role) {
+        alert("Please select a role");
+        return;
+      }
+
+      currentUser = name;
+      currentRole = role;
+      localStorage.setItem('currentUser', currentUser);
+      localStorage.setItem('currentRole', currentRole);
+      loginSection.style.display = 'none';
+      showForm();
+      populateForm();
+      renderProfiles();
     }
 
     function logoutUser() {
       localStorage.removeItem('currentUser');
-      loginSection.style.display = 'block';
-      profileForm.classList.add('hidden');
+      localStorage.removeItem('currentRole');
+      location.reload();
+    }
+
+    function showForm() {
+      if (currentRole === 'staff') {
+        staffForm.classList.remove('hidden');
+      } else {
+        studentForm.classList.remove('hidden');
+      }
     }
 
     function populateForm() {
       const user = users.find(u => u.name === currentUser);
-      if (user) {
+      if (!user) return;
+
+      if (currentRole === 'staff') {
+        document.getElementById('staffExpertise').value = user.expertise || "";
+        document.getElementById('research').value = user.research || "";
+        document.getElementById('sitting').value = user.sitting || "";
+        document.getElementById('department').value = user.department || "";
+      } else {
         document.getElementById('mother').value = user.mother || "";
-        document.getElementById('year').value = user.year;
-        document.getElementById('division').value = user.division;
-        document.getElementById('roll').value = user.roll;
-        document.getElementById('contact').value = user.contact;
-        document.getElementById('interests').value = user.interests.join(', ');
-        document.getElementById('expertise').value = user.expertise;
-        document.getElementById('experience').value = user.experience;
-        document.getElementById('branch').value = user.branch;
-        document.getElementById('role').value = user.role;
+        document.getElementById('year').value = user.year || "";
+        document.getElementById('division').value = user.division || "";
+        document.getElementById('roll').value = user.roll || "";
+        document.getElementById('contact').value = user.contact || "";
+        document.getElementById('interests').value = user.interests?.join(', ') || "";
+        document.getElementById('expertise').value = user.expertise || "";
+        document.getElementById('experience').value = user.experience || "";
+        document.getElementById('branch').value = user.branch || "";
       }
     }
 
-    document.getElementById('profileForm').addEventListener('submit', function (e) {
+    studentForm.addEventListener('submit', function (e) {
       e.preventDefault();
 
       const user = {
         name: currentUser,
+        role: 'student',
         mother: document.getElementById('mother').value,
         year: document.getElementById('year').value,
         division: document.getElementById('division').value,
@@ -118,20 +160,57 @@
         interests: document.getElementById('interests').value.toLowerCase().split(',').map(i => i.trim()),
         expertise: document.getElementById('expertise').value,
         experience: document.getElementById('experience').value,
-        branch: document.getElementById('branch').value,
-        role: document.getElementById('role').value
+        branch: document.getElementById('branch').value
       };
 
+      saveUser(user);
+    });
+
+    staffForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const user = {
+        name: currentUser,
+        role: 'staff',
+        expertise: document.getElementById('staffExpertise').value,
+        research: document.getElementById('research').value,
+        sitting: document.getElementById('sitting').value,
+        department: document.getElementById('department').value
+      };
+
+      saveUser(user);
+    });
+
+    function saveUser(user) {
       const index = users.findIndex(u => u.name === currentUser);
-      if (index >= 0) {
-        users[index] = user;
-      } else {
-        users.push(user);
-      }
+      if (index >= 0) users[index] = user;
+      else users.push(user);
 
       localStorage.setItem('users', JSON.stringify(users));
       renderProfiles();
-    });
+    }
+
+    function deleteUser(name) {
+      if (!confirm("Are you sure you want to delete this profile?")) return;
+
+      users = users.filter(u => u.name !== name);
+      if (name === currentUser) logoutUser();
+      else {
+        localStorage.setItem('users', JSON.stringify(users));
+        renderProfiles();
+      }
+    }
+
+    function editUser(name) {
+      const user = users.find(u => u.name === name);
+      if (!user) return;
+
+      currentUser = user.name;
+      currentRole = user.role;
+      localStorage.setItem('currentUser', currentUser);
+      localStorage.setItem('currentRole', currentRole);
+      location.reload();
+    }
 
     function renderProfiles() {
       const query = searchInput.value.toLowerCase();
@@ -140,30 +219,49 @@
       users
         .filter(user =>
           user.name.toLowerCase().includes(query) ||
-          user.branch.toLowerCase().includes(query) ||
+          (user.branch?.toLowerCase() || '').includes(query) ||
           user.role.toLowerCase().includes(query)
         )
-        .forEach((user, index) => {
-          const recommendations = users.filter((u, i) => i !== index && u.interests.some(i => user.interests.includes(i)));
-
-          const bgColor = user.role === 'staff' ? 'bg-yellow-100 border-yellow-400' : 'bg-white';
-
+        .forEach(user => {
           const div = document.createElement('div');
-          div.className = `p-4 rounded shadow border ${bgColor}`;
-          div.innerHTML = `
-            <h3 class="text-lg font-bold">${user.name}</h3>
-            <p><strong>Mother's Name:</strong> ${user.mother}</p>
-            <p><strong>Year:</strong> ${user.year}</p>
-            <p><strong>Division:</strong> ${user.division}</p>
-            <p><strong>Roll No:</strong> ${user.roll}</p>
-            <p><strong>Contact:</strong> ${user.contact}</p>
-            <p><strong>Branch:</strong> ${user.branch}</p>
-            <p><strong>Role:</strong> ${user.role}</p>
-            <p><strong>Interests:</strong> ${user.interests.join(', ')}</p>
-            <p><strong>Expertise:</strong> ${user.expertise}</p>
-            <p><strong>Experience:</strong> ${user.experience}</p>
-            <p class="mt-2 text-sm text-gray-600">Matches with: ${recommendations.map(r => r.name).join(', ') || 'No matches yet'}</p>
-          `;
+          div.className = `p-4 rounded shadow border relative ${
+            user.role === 'staff' ? 'bg-yellow-100 border-yellow-400' : 'bg-white'
+          }`;
+
+          if (user.role === 'staff') {
+            div.innerHTML = `
+              <h3 class="text-lg font-bold">${user.name}</h3>
+              <p><strong>Role:</strong> ${user.role}</p>
+              <p><strong>Expertise:</strong> ${user.expertise}</p>
+              <p><strong>Field of Research:</strong> ${user.research}</p>
+              <p><strong>Sitting Location:</strong> ${user.sitting}</p>
+              <p><strong>Department:</strong> ${user.department}</p>
+            `;
+          } else {
+            div.innerHTML = `
+              <h3 class="text-lg font-bold">${user.name}</h3>
+              <p><strong>Mother's Name:</strong> ${user.mother}</p>
+              <p><strong>Year:</strong> ${user.year}</p>
+              <p><strong>Division:</strong> ${user.division}</p>
+              <p><strong>Roll No:</strong> ${user.roll}</p>
+              <p><strong>Contact:</strong> ${user.contact}</p>
+              <p><strong>Branch:</strong> ${user.branch}</p>
+              <p><strong>Role:</strong> ${user.role}</p>
+              <p><strong>Interests:</strong> ${user.interests?.join(', ')}</p>
+              <p><strong>Expertise:</strong> ${user.expertise}</p>
+              <p><strong>Experience:</strong> ${user.experience}</p>
+            `;
+          }
+
+          if (user.name === currentUser) {
+            div.innerHTML += `
+              <div class="mt-4 flex gap-2">
+                <button onclick="editUser('${user.name}')" class="bg-green-500 text-white px-3 py-1 rounded">Edit</button>
+                <button onclick="deleteUser('${user.name}')" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+              </div>
+            `;
+          }
+
           profilesContainer.appendChild(div);
         });
     }
