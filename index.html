@@ -67,8 +67,7 @@
 
     function logoutUser() {
       localStorage.removeItem('currentUser');
-      loginSection.style.display = 'block';
-      profileForm.classList.add('hidden');
+      location.reload(); // reload to reset view
     }
 
     function populateForm() {
@@ -112,8 +111,10 @@
 
     function renderProfiles() {
       profilesContainer.innerHTML = '';
-      users.forEach((user, index) => {
-        const recommendations = users.filter((u, i) => i !== index && u.interests.some(interest => user.interests.includes(interest)));
+      users.forEach(user => {
+        const matches = users
+          .filter(u => u.name !== user.name && u.interests.some(interest => user.interests.includes(interest)))
+          .map(u => u.name);
 
         const div = document.createElement('div');
         div.className = 'p-4 bg-white rounded shadow';
@@ -126,7 +127,7 @@
           <p><strong>Interests:</strong> ${user.interests.join(', ')}</p>
           <p><strong>Expertise:</strong> ${user.expertise}</p>
           <p><strong>Experience:</strong> ${user.experience}</p>
-          <p class="mt-2 text-sm text-gray-600">Matches with: ${recommendations.map(r => r.name).join(', ') || 'No matches yet'}</p>
+          <p class="mt-2 text-sm text-gray-600">Matches with: ${matches.join(', ') || 'No matches yet'}</p>
         `;
         profilesContainer.appendChild(div);
       });
@@ -134,3 +135,4 @@
   </script>
 </body>
 </html>
+
