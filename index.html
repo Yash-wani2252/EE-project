@@ -2,28 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>College Connect</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 p-4">
-  <div class="max-w-4xl mx-auto">
+  <div class="max-w-5xl mx-auto">
     <h1 class="text-3xl font-bold mb-6 text-center">College Connect</h1>
 
-    <!-- Login Form -->
+    <!-- Login -->
     <div id="loginSection" class="bg-white p-6 rounded shadow mb-8">
       <h2 class="text-xl font-semibold mb-2">Login</h2>
-      <input type="text" id="loginName" placeholder="Enter your name to login" class="border p-2 rounded w-full mb-2" />
+      <input type="text" id="loginName" placeholder="Enter full name (Name Father's Name Surname)" class="border p-2 rounded w-full mb-2" />
       <button onclick="loginUser()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Login</button>
     </div>
 
-    <!-- Profile Form -->
+    <!-- Profile -->
     <form id="profileForm" class="bg-white p-6 rounded shadow mb-4 hidden">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" placeholder="Mother's Name" id="mother" class="border p-2 rounded" required />
         <input type="text" placeholder="College Year" id="year" class="border p-2 rounded" required />
         <input type="text" placeholder="Division" id="division" class="border p-2 rounded" required />
         <input type="text" placeholder="Roll Number" id="roll" class="border p-2 rounded" required />
         <input type="text" placeholder="Contact Number" id="contact" class="border p-2 rounded" required />
+        <select id="branch" class="border p-2 rounded" required>
+          <option value="">Select Branch</option>
+          <option value="Civil Engineering">Civil Engineering</option>
+          <option value="Computer Engineering">Computer Engineering</option>
+        </select>
+        <select id="role" class="border p-2 rounded" required>
+          <option value="student">Student</option>
+          <option value="staff">Staff</option>
+        </select>
         <input type="text" placeholder="Interests (comma separated)" id="interests" class="border p-2 rounded" required />
         <input type="text" placeholder="Expertise" id="expertise" class="border p-2 rounded" required />
         <input type="text" placeholder="Experience" id="experience" class="border p-2 rounded" required />
@@ -31,6 +41,11 @@
       <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit</button>
       <button type="button" onclick="logoutUser()" class="mt-4 ml-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
     </form>
+
+    <!-- Search Bar -->
+    <div class="mb-4">
+      <input type="text" id="searchInput" oninput="renderProfiles()" placeholder="Search by name, branch or role..." class="border p-2 w-full rounded shadow-sm" />
+    </div>
 
     <!-- Profiles Display -->
     <h2 class="text-xl font-semibold mb-4">User Profiles</h2>
@@ -42,6 +57,7 @@
     const profileForm = document.getElementById('profileForm');
     const profilesContainer = document.getElementById('profiles');
     const loginNameInput = document.getElementById('loginName');
+    const searchInput = document.getElementById('searchInput');
 
     let currentUser = localStorage.getItem('currentUser') || null;
     let users = JSON.parse(localStorage.getItem('users')) || [];
@@ -55,40 +71,46 @@
 
     function loginUser() {
       const name = loginNameInput.value.trim();
-      if (name) {
+      if (/^\w+\s\w+\s\w+$/.test(name)) {
         currentUser = name;
         localStorage.setItem('currentUser', currentUser);
         loginSection.style.display = 'none';
         profileForm.classList.remove('hidden');
         populateForm();
         renderProfiles();
+      } else {
+        alert("Please enter your full name in the format: Name Father's Name Surname");
       }
     }
 
     function logoutUser() {
       localStorage.removeItem('currentUser');
-      location.reload(); // reload to reset view
+      loginSection.style.display = 'block';
+      profileForm.classList.add('hidden');
     }
 
     function populateForm() {
-      const existing = users.find(u => u.name === currentUser);
-      if (existing) {
-        document.getElementById('year').value = existing.year;
-        document.getElementById('division').value = existing.division;
-        document.getElementById('roll').value = existing.roll;
-        document.getElementById('contact').value = existing.contact;
-        document.getElementById('interests').value = existing.interests.join(', ');
-        document.getElementById('expertise').value = existing.expertise;
-        document.getElementById('experience').value = existing.experience;
+      const user = users.find(u => u.name === currentUser);
+      if (user) {
+        document.getElementById('mother').value = user.mother || "";
+        document.getElementById('year').value = user.year;
+        document.getElementById('division').value = user.division;
+        document.getElementById('roll').value = user.roll;
+        document.getElementById('contact').value = user.contact;
+        document.getElementById('interests').value = user.interests.join(', ');
+        document.getElementById('expertise').value = user.expertise;
+        document.getElementById('experience').value = user.experience;
+        document.getElementById('branch').value = user.branch;
+        document.getElementById('role').value = user.role;
       }
     }
 
-    const form = document.getElementById('profileForm');
-    form.addEventListener('submit', function (e) {
+    document.getElementById('profileForm').addEventListener('submit', function (e) {
       e.preventDefault();
 
       const user = {
         name: currentUser,
+        mother: document.getElementById('mother').value,
         year: document.getElementById('year').value,
         division: document.getElementById('division').value,
         roll: document.getElementById('roll').value,
@@ -96,43 +118,55 @@
         interests: document.getElementById('interests').value.toLowerCase().split(',').map(i => i.trim()),
         expertise: document.getElementById('expertise').value,
         experience: document.getElementById('experience').value,
+        branch: document.getElementById('branch').value,
+        role: document.getElementById('role').value
       };
 
-      const existingIndex = users.findIndex(u => u.name === currentUser);
-      if (existingIndex >= 0) {
-        users[existingIndex] = user;
+      const index = users.findIndex(u => u.name === currentUser);
+      if (index >= 0) {
+        users[index] = user;
       } else {
         users.push(user);
       }
+
       localStorage.setItem('users', JSON.stringify(users));
       renderProfiles();
-      populateForm();
     });
 
     function renderProfiles() {
+      const query = searchInput.value.toLowerCase();
       profilesContainer.innerHTML = '';
-      users.forEach(user => {
-        const matches = users
-          .filter(u => u.name !== user.name && u.interests.some(interest => user.interests.includes(interest)))
-          .map(u => u.name);
 
-        const div = document.createElement('div');
-        div.className = 'p-4 bg-white rounded shadow';
-        div.innerHTML = `
-          <h3 class="text-lg font-bold">${user.name}</h3>
-          <p><strong>Year:</strong> ${user.year}</p>
-          <p><strong>Division:</strong> ${user.division}</p>
-          <p><strong>Roll No:</strong> ${user.roll}</p>
-          <p><strong>Contact:</strong> ${user.contact}</p>
-          <p><strong>Interests:</strong> ${user.interests.join(', ')}</p>
-          <p><strong>Expertise:</strong> ${user.expertise}</p>
-          <p><strong>Experience:</strong> ${user.experience}</p>
-          <p class="mt-2 text-sm text-gray-600">Matches with: ${matches.join(', ') || 'No matches yet'}</p>
-        `;
-        profilesContainer.appendChild(div);
-      });
+      users
+        .filter(user =>
+          user.name.toLowerCase().includes(query) ||
+          user.branch.toLowerCase().includes(query) ||
+          user.role.toLowerCase().includes(query)
+        )
+        .forEach((user, index) => {
+          const recommendations = users.filter((u, i) => i !== index && u.interests.some(i => user.interests.includes(i)));
+
+          const bgColor = user.role === 'staff' ? 'bg-yellow-100 border-yellow-400' : 'bg-white';
+
+          const div = document.createElement('div');
+          div.className = `p-4 rounded shadow border ${bgColor}`;
+          div.innerHTML = `
+            <h3 class="text-lg font-bold">${user.name}</h3>
+            <p><strong>Mother's Name:</strong> ${user.mother}</p>
+            <p><strong>Year:</strong> ${user.year}</p>
+            <p><strong>Division:</strong> ${user.division}</p>
+            <p><strong>Roll No:</strong> ${user.roll}</p>
+            <p><strong>Contact:</strong> ${user.contact}</p>
+            <p><strong>Branch:</strong> ${user.branch}</p>
+            <p><strong>Role:</strong> ${user.role}</p>
+            <p><strong>Interests:</strong> ${user.interests.join(', ')}</p>
+            <p><strong>Expertise:</strong> ${user.expertise}</p>
+            <p><strong>Experience:</strong> ${user.experience}</p>
+            <p class="mt-2 text-sm text-gray-600">Matches with: ${recommendations.map(r => r.name).join(', ') || 'No matches yet'}</p>
+          `;
+          profilesContainer.appendChild(div);
+        });
     }
   </script>
 </body>
 </html>
-
