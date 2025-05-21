@@ -69,7 +69,7 @@
       </div>
 
       <div class="mt-4 flex gap-2">
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Profile</button>
+        <button id="saveButton" type="button" onclick="saveProfile()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Profile</button>
         <button type="button" onclick="logoutUser()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
       </div>
     </form>
@@ -93,9 +93,25 @@
     const searchInput = document.getElementById("search");
     const profilesContainer = document.getElementById("profiles");
 
-    // Get data from localStorage
-    let currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
-    let users = JSON.parse(localStorage.getItem("users")) || [];
+    // Get data from localStorage with debug logging
+    let currentUser = null;
+    let users = [];
+    
+    try {
+      const storedUser = localStorage.getItem("currentUser");
+      const storedUsers = localStorage.getItem("users");
+      
+      console.log("Retrieved from localStorage - currentUser:", storedUser);
+      console.log("Retrieved from localStorage - users:", storedUsers);
+      
+      currentUser = storedUser ? JSON.parse(storedUser) : null;
+      users = storedUsers ? JSON.parse(storedUsers) : [];
+    } catch (error) {
+      console.error("Error loading data from localStorage:", error);
+      // Reset to defaults if there's an error
+      currentUser = null;
+      users = [];
+    }
 
     // Check if user is logged in and set up UI accordingly
     if (currentUser) {
@@ -168,40 +184,57 @@
       saveProfile();
     });
 
-    // Save profile data
+    // Save profile data - Fixed to ensure data is properly saved to localStorage
     function saveProfile() {
-      if (!currentUser) return;
+      if (!currentUser) {
+        alert("You must be logged in to save a profile!");
+        return;
+      }
       
       const type = currentUser.type;
       let user = { name: currentUser.name, type };
 
       if (type === "student") {
-        user.father = document.getElementById("father").value;
-        user.mother = document.getElementById("mother").value;
-        user.year = document.getElementById("year").value;
-        user.division = document.getElementById("division").value;
-        user.roll = document.getElementById("roll").value;
-        user.contact = document.getElementById("contact").value;
-        user.branch = document.getElementById("branch").value;
-        user.interests = document.getElementById("interests").value.toLowerCase().split(",").map(i => i.trim());
-        user.expertise = document.getElementById("expertise").value;
-        user.experience = document.getElementById("experience").value;
+        // Collect all student field values
+        user.father = document.getElementById("father").value || "";
+        user.mother = document.getElementById("mother").value || "";
+        user.year = document.getElementById("year").value || "";
+        user.division = document.getElementById("division").value || "";
+        user.roll = document.getElementById("roll").value || "";
+        user.contact = document.getElementById("contact").value || "";
+        user.branch = document.getElementById("branch").value || "";
+        
+        // Process interests as an array
+        const interestsString = document.getElementById("interests").value || "";
+        user.interests = interestsString.toLowerCase().split(",").map(i => i.trim()).filter(i => i);
+        
+        user.expertise = document.getElementById("expertise").value || "";
+        user.experience = document.getElementById("experience").value || "";
       } else {
-        user.expertise = document.getElementById("staffExpertise").value;
-        user.research = document.getElementById("research").value;
-        user.location = document.getElementById("location").value;
-        user.branch = document.getElementById("staffBranch").value;
-        user.contact = document.getElementById("staffContact").value;
+        // Collect all staff field values
+        user.expertise = document.getElementById("staffExpertise").value || "";
+        user.research = document.getElementById("research").value || "";
+        user.location = document.getElementById("location").value || "";
+        user.branch = document.getElementById("staffBranch").value || "";
+        user.contact = document.getElementById("staffContact").value || "";
       }
 
+      // Find and update or add user
       const index = users.findIndex(u => u.name === currentUser.name);
+      console.log("Updating user index:", index, "with data:", JSON.stringify(user));
+      
       if (index >= 0) {
         users[index] = user;
       } else {
         users.push(user);
       }
 
+      // Save to localStorage
       localStorage.setItem("users", JSON.stringify(users));
+      
+      // Debug log to verify data is being saved
+      console.log("Profile saved to localStorage:", JSON.stringify(users));
+      
       renderProfiles();
       alert("Profile saved successfully!");
     }
@@ -280,4 +313,3 @@
   </script>
 </body>
 </html>
-
