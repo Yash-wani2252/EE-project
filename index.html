@@ -6,237 +6,208 @@
   <title>College Connect - KKWIEER</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans">
-
-  <!-- Header -->
-  <header class="bg-indigo-700 text-white py-6 shadow-md mb-8">
-    <div class="max-w-4xl mx-auto px-4">
-      <h1 class="text-4xl font-bold mb-1">College Connect</h1>
-      <p class="text-lg">KKWIEER's Community Platform to Connect Students and Faculty</p>
-    </div>
-  </header>
-
-  <!-- Blog / Introduction Section -->
-  <section class="max-w-4xl mx-auto px-4 mb-10">
-    <div class="bg-white p-6 rounded shadow-lg border-l-4 border-indigo-500">
-      <h2 class="text-2xl font-semibold mb-3 text-indigo-700">About College Connect</h2>
-      <p class="text-gray-700 text-md leading-relaxed">
-        College Connect is a collaborative platform created exclusively for the students and faculty members of <strong>KKWIEER</strong>. 
-        Our goal is to foster better communication, discovery, and collaboration within our academic community.
-        <br/><br/>
-        Students can create rich profiles highlighting their interests, expertise, and academic background, while faculty members can showcase their research fields, departmental roles, and areas of specialization.
-        <br/><br/>
-        With built-in search, branch filtering, and personalized login, College Connect helps you explore your peers, discover common interests, and build meaningful connections — whether you're looking for project collaborators, mentors, or simply to know more about your college community.
-        <br/><br/>
-        Welcome to a smarter, more connected KKWIEER!
+<body class="bg-gray-100 font-sans">
+  <div class="max-w-5xl mx-auto p-6">
+    <!-- Intro Blog -->
+    <section class="bg-white p-6 rounded shadow mb-8">
+      <h1 class="text-3xl font-bold mb-4 text-purple-700 text-center">Welcome to College Connect - KKWIEER</h1>
+      <p class="text-gray-700 text-lg leading-relaxed">
+        College Connect is an initiative by students of <strong>KKWIEER</strong> to help peers and faculty interact,
+        collaborate, and grow together. Whether you're a student finding project partners or a faculty member sharing
+        your expertise, this platform lets you create a profile and discover others based on mutual interests, departments,
+        and research domains. Let's build a stronger campus community, one connection at a time.
       </p>
-    </div>
-  </section>
+    </section>
 
-  <!-- Login -->
-  <main class="max-w-4xl mx-auto px-4">
-    <div id="loginSection" class="bg-white p-6 rounded shadow mb-6">
-      <h2 class="text-2xl font-semibold mb-4">Login</h2>
-      <input id="loginName" placeholder="Enter Full Name (e.g., John Michael Doe)" class="border p-2 rounded w-full mb-2"/>
-      <select id="userType" class="border p-2 rounded w-full mb-2">
+    <!-- Login -->
+    <section id="loginSection" class="bg-white p-6 rounded shadow mb-8">
+      <h2 class="text-2xl font-semibold mb-4 text-center">Login</h2>
+      <select id="roleSelect" class="w-full p-2 border rounded mb-2">
         <option value="student">Student</option>
         <option value="staff">Staff</option>
       </select>
-      <button onclick="loginUser()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Login</button>
-    </div>
+      <input type="text" id="fullName" placeholder="Full Name (Name Father's Name Surname)" class="w-full p-2 border rounded mb-2">
+      <input type="text" id="fatherName" placeholder="Father's Name (optional for staff)" class="w-full p-2 border rounded mb-2">
+      <button onclick="loginUser()" class="bg-green-500 text-white px-4 py-2 rounded w-full hover:bg-green-600">Login</button>
+    </section>
 
     <!-- Profile Form -->
     <form id="profileForm" class="bg-white p-6 rounded shadow mb-6 hidden">
-      <div id="studentFields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input id="father" placeholder="Father's Name" class="border p-2 rounded"/>
-        <input id="mother" placeholder="Mother's Name" class="border p-2 rounded" required/>
-        <input id="year" placeholder="College Year" class="border p-2 rounded" required/>
-        <input id="division" placeholder="Division" class="border p-2 rounded" required/>
-        <input id="roll" placeholder="Roll Number" class="border p-2 rounded" required/>
-        <input id="contact" placeholder="Contact Number" class="border p-2 rounded" required/>
-        <input id="branch" placeholder="Branch (Civil/Computer Engineering)" class="border p-2 rounded" required/>
-        <input id="interests" placeholder="Interests (comma separated)" class="border p-2 rounded" required/>
-        <input id="expertise" placeholder="Expertise" class="border p-2 rounded" required/>
-        <input id="experience" placeholder="Experience" class="border p-2 rounded" required/>
+      <div id="studentFields" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <input type="text" placeholder="Mother's Name" id="motherName" class="border p-2 rounded">
+        <input type="text" placeholder="Branch (Civil Engineering / Computer Engineering)" id="branch" class="border p-2 rounded">
+        <input type="text" placeholder="Year" id="year" class="border p-2 rounded">
+        <input type="text" placeholder="Division" id="division" class="border p-2 rounded">
+        <input type="text" placeholder="Roll No" id="roll" class="border p-2 rounded">
+        <input type="text" placeholder="Contact No" id="contact" class="border p-2 rounded">
+        <input type="text" placeholder="Interests (comma separated)" id="interests" class="border p-2 rounded">
+        <input type="text" placeholder="Expertise" id="expertise" class="border p-2 rounded">
+        <input type="text" placeholder="Experience" id="experience" class="border p-2 rounded">
       </div>
 
-      <div id="staffFields" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
-        <input id="staffExpertise" placeholder="Expertise" class="border p-2 rounded" required/>
-        <input id="research" placeholder="Field of Research" class="border p-2 rounded" required/>
-        <input id="location" placeholder="Sitting Location" class="border p-2 rounded" required/>
-        <input id="staffBranch" placeholder="Department" class="border p-2 rounded" required/>
-        <input id="staffContact" placeholder="Phone Number" class="border p-2 rounded" required/>
+      <div id="staffFields" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 hidden">
+        <input type="text" placeholder="Expertise" id="staffExpertise" class="border p-2 rounded">
+        <input type="text" placeholder="Field of Research" id="research" class="border p-2 rounded">
+        <input type="text" placeholder="Sitting Location" id="location" class="border p-2 rounded">
+        <input type="text" placeholder="Department" id="department" class="border p-2 rounded">
+        <input type="text" placeholder="Phone Number" id="staffContact" class="border p-2 rounded">
       </div>
 
-      <div class="mt-4 flex gap-2">
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Profile</button>
-        <button type="button" onclick="logoutUser()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
-      </div>
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save</button>
+      <button type="button" onclick="logoutUser()" class="ml-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
     </form>
 
-    <!-- Search -->
-    <input oninput="renderProfiles()" id="search" placeholder="Search by name or interest..." class="border p-2 rounded w-full mb-4"/>
+    <!-- Search Bar -->
+    <input type="text" id="searchInput" placeholder="Search by name, branch or department" class="w-full p-2 border rounded mb-4">
 
-    <!-- Profiles List -->
-    <h2 class="text-xl font-semibold mb-2">All Profiles</h2>
-    <div id="profiles" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10"></div>
-  </main>
+    <!-- Profiles -->
+    <div id="profiles" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  </div>
 
-  <!-- JavaScript Logic -->
   <script>
-    const loginNameInput = document.getElementById("loginName");
-    const userTypeSelect = document.getElementById("userType");
-    const profileForm = document.getElementById("profileForm");
-    const studentFields = document.getElementById("studentFields");
-    const staffFields = document.getElementById("staffFields");
-    const searchInput = document.getElementById("search");
-    const profilesContainer = document.getElementById("profiles");
+    const loginSection = document.getElementById('loginSection');
+    const profileForm = document.getElementById('profileForm');
+    const profilesContainer = document.getElementById('profiles');
+    const roleSelect = document.getElementById('roleSelect');
+    const studentFields = document.getElementById('studentFields');
+    const staffFields = document.getElementById('staffFields');
 
-    let currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-
-    if (currentUser) {
-      document.getElementById("loginSection").style.display = "none";
-      profileForm.classList.remove("hidden");
-      showFormFields(currentUser.type);
-      populateForm();
-      renderProfiles();
-    }
+    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+    let users = JSON.parse(localStorage.getItem('users')) || [];
 
     function loginUser() {
-      const name = loginNameInput.value.trim();
-      const type = userTypeSelect.value;
+      const role = roleSelect.value;
+      const name = document.getElementById('fullName').value.trim();
+      const fatherName = document.getElementById('fatherName').value.trim();
+      if (!name) return alert("Please enter your full name");
 
-      if (!name || (type === "student" && name.split(" ").length < 3)) {
-        alert("Please enter your full name in 'Name Father's Name Surname' format.");
-        return;
+      currentUser = { name, role, fatherName };
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+      loginSection.style.display = 'none';
+      profileForm.classList.remove('hidden');
+
+      if (role === 'student') {
+        studentFields.classList.remove('hidden');
+        staffFields.classList.add('hidden');
+      } else {
+        studentFields.classList.add('hidden');
+        staffFields.classList.remove('hidden');
       }
 
-      currentUser = { name, type };
-      localStorage.setItem("currentUser", JSON.stringify(currentUser));
-      document.getElementById("loginSection").style.display = "none";
-      profileForm.classList.remove("hidden");
-      showFormFields(type);
       populateForm();
       renderProfiles();
     }
 
     function logoutUser() {
-      localStorage.removeItem("currentUser");
+      localStorage.removeItem('currentUser');
       location.reload();
     }
 
-    function showFormFields(type) {
-      studentFields.classList.toggle("hidden", type !== "student");
-      staffFields.classList.toggle("hidden", type !== "staff");
-    }
-
     function populateForm() {
-      const u = users.find(u => u.name === currentUser.name);
-      if (!u) return;
+      if (!currentUser) return;
+      const user = users.find(u => u.name === currentUser.name);
+      if (!user) return;
 
-      if (currentUser.type === "student") {
-        document.getElementById("father").value = u.father || "";
-        document.getElementById("mother").value = u.mother || "";
-        document.getElementById("year").value = u.year;
-        document.getElementById("division").value = u.division;
-        document.getElementById("roll").value = u.roll;
-        document.getElementById("contact").value = u.contact;
-        document.getElementById("branch").value = u.branch;
-        document.getElementById("interests").value = u.interests.join(", ");
-        document.getElementById("expertise").value = u.expertise;
-        document.getElementById("experience").value = u.experience;
+      if (currentUser.role === 'student') {
+        document.getElementById('motherName').value = user.motherName || '';
+        document.getElementById('branch').value = user.branch || '';
+        document.getElementById('year').value = user.year || '';
+        document.getElementById('division').value = user.division || '';
+        document.getElementById('roll').value = user.roll || '';
+        document.getElementById('contact').value = user.contact || '';
+        document.getElementById('interests').value = user.interests ? user.interests.join(', ') : '';
+        document.getElementById('expertise').value = user.expertise || '';
+        document.getElementById('experience').value = user.experience || '';
       } else {
-        document.getElementById("staffExpertise").value = u.expertise;
-        document.getElementById("research").value = u.research;
-        document.getElementById("location").value = u.location;
-        document.getElementById("staffBranch").value = u.branch;
-        document.getElementById("staffContact").value = u.contact;
+        document.getElementById('staffExpertise').value = user.expertise || '';
+        document.getElementById('research').value = user.research || '';
+        document.getElementById('location').value = user.location || '';
+        document.getElementById('department').value = user.department || '';
+        document.getElementById('staffContact').value = user.contact || '';
       }
     }
 
-    profileForm.addEventListener("submit", function (e) {
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const type = currentUser.type;
+      if (!currentUser) return;
 
-      let user = { name: currentUser.name, type };
+      let user = { name: currentUser.name, role: currentUser.role };
 
-      if (type === "student") {
-        user.father = document.getElementById("father").value;
-        user.mother = document.getElementById("mother").value;
-        user.year = document.getElementById("year").value;
-        user.division = document.getElementById("division").value;
-        user.roll = document.getElementById("roll").value;
-        user.contact = document.getElementById("contact").value;
-        user.branch = document.getElementById("branch").value;
-        user.interests = document.getElementById("interests").value.toLowerCase().split(",").map(i => i.trim());
-        user.expertise = document.getElementById("expertise").value;
-        user.experience = document.getElementById("experience").value;
+      if (currentUser.role === 'student') {
+        user = {
+          ...user,
+          motherName: document.getElementById('motherName').value,
+          branch: document.getElementById('branch').value,
+          year: document.getElementById('year').value,
+          division: document.getElementById('division').value,
+          roll: document.getElementById('roll').value,
+          contact: document.getElementById('contact').value,
+          interests: document.getElementById('interests').value.split(',').map(i => i.trim().toLowerCase()),
+          expertise: document.getElementById('expertise').value,
+          experience: document.getElementById('experience').value
+        };
       } else {
-        user.expertise = document.getElementById("staffExpertise").value;
-        user.research = document.getElementById("research").value;
-        user.location = document.getElementById("location").value;
-        user.branch = document.getElementById("staffBranch").value;
-        user.contact = document.getElementById("staffContact").value;
+        user = {
+          ...user,
+          expertise: document.getElementById('staffExpertise').value,
+          research: document.getElementById('research').value,
+          location: document.getElementById('location').value,
+          department: document.getElementById('department').value,
+          contact: document.getElementById('staffContact').value
+        };
       }
 
       const index = users.findIndex(u => u.name === currentUser.name);
       if (index >= 0) users[index] = user;
       else users.push(user);
 
-      localStorage.setItem("users", JSON.stringify(users));
+      localStorage.setItem('users', JSON.stringify(users));
       renderProfiles();
-      alert("Profile saved!");
     });
 
-    function renderProfiles() {
-      const search = searchInput.value.toLowerCase();
-      profilesContainer.innerHTML = "";
+    function renderProfiles(filter = '') {
+      profilesContainer.innerHTML = '';
+      users.filter(user => user.name.toLowerCase().includes(filter) || (user.branch || '').toLowerCase().includes(filter) || (user.department || '').toLowerCase().includes(filter)).forEach(user => {
+        const card = document.createElement('div');
+        card.className = `p-4 rounded shadow ${user.role === 'staff' ? 'bg-yellow-100' : 'bg-white'}`;
 
-      users
-        .filter(u => u.name.toLowerCase().includes(search) || (u.interests && u.interests.join().includes(search)))
-        .forEach(u => {
-          const card = document.createElement("div");
-          card.className = `p-4 rounded shadow ${u.type === 'staff' ? 'bg-yellow-100' : 'bg-white'}`;
-          card.innerHTML = `
-            <h3 class="text-lg font-bold">${u.name}</h3>
-            ${u.type === "student" ? `
-              <p><strong>Year:</strong> ${u.year}</p>
-              <p><strong>Division:</strong> ${u.division}</p>
-              <p><strong>Roll No:</strong> ${u.roll}</p>
-              <p><strong>Contact:</strong> ${u.contact}</p>
-              <p><strong>Branch:</strong> ${u.branch}</p>
-              <p><strong>Interests:</strong> ${u.interests.join(', ')}</p>
-              <p><strong>Expertise:</strong> ${u.expertise}</p>
-              <p><strong>Experience:</strong> ${u.experience}</p>
-            ` : `
-              <p><strong>Department:</strong> ${u.branch}</p>
-              <p><strong>Expertise:</strong> ${u.expertise}</p>
-              <p><strong>Research:</strong> ${u.research}</p>
-              <p><strong>Location:</strong> ${u.location}</p>
-              <p><strong>Contact:</strong> ${u.contact}</p>
-            `}
-            <div class="mt-2 flex gap-2">
-              <button onclick="editProfile('${u.name}')" class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Edit</button>
-              <button onclick="deleteProfile('${u.name}')" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Delete</button>
-            </div>
+        let innerHTML = `<h3 class="text-xl font-bold">${user.name}</h3>`;
+        if (user.role === 'student') {
+          innerHTML += `
+            <p>Mother's Name: ${user.motherName}</p>
+            <p>Branch: ${user.branch}</p>
+            <p>Year: ${user.year}, Division: ${user.division}</p>
+            <p>Roll No: ${user.roll}, Contact: ${user.contact}</p>
+            <p>Interests: ${user.interests.join(', ')}</p>
+            <p>Expertise: ${user.expertise}</p>
+            <p>Experience: ${user.experience}</p>
           `;
-          profilesContainer.appendChild(card);
-        });
+        } else {
+          innerHTML += `
+            <p>Expertise: ${user.expertise}</p>
+            <p>Research: ${user.research}</p>
+            <p>Location: ${user.location}</p>
+            <p>Department: ${user.department}</p>
+            <p>Phone: ${user.contact}</p>
+          `;
+        }
+
+        card.innerHTML = innerHTML;
+        profilesContainer.appendChild(card);
+      });
     }
 
-    function editProfile(name) {
-      currentUser = { name, type: users.find(u => u.name === name).type };
-      localStorage.setItem("currentUser", JSON.stringify(currentUser));
-      location.reload();
-    }
+    document.getElementById('searchInput').addEventListener('input', e => {
+      renderProfiles(e.target.value.toLowerCase());
+    });
 
-    function deleteProfile(name) {
-      if (confirm("Are you sure you want to delete this profile?")) {
-        users = users.filter(u => u.name !== name);
-        localStorage.setItem("users", JSON.stringify(users));
-        renderProfiles();
-      }
+    if (currentUser) {
+      loginSection.style.display = 'none';
+      profileForm.classList.remove('hidden');
+      (currentUser.role === 'student' ? studentFields : staffFields).classList.remove('hidden');
+      populateForm();
+      renderProfiles();
     }
   </script>
 </body>
