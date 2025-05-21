@@ -3,21 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>College Connect</title>
+  <title>College Connect - KKWIEER</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans">
 
-  <!-- Blog Header -->
-  <header class="bg-indigo-600 text-white py-6 shadow-md mb-8">
+  <!-- Header -->
+  <header class="bg-indigo-700 text-white py-6 shadow-md mb-8">
     <div class="max-w-4xl mx-auto px-4">
-      <h1 class="text-4xl font-bold mb-2">Welcome to College Connect</h1>
-      <p class="text-lg">Your go-to hub to connect with students and staff across departments. Fill your profile, discover others, and collaborate easily!</p>
+      <h1 class="text-4xl font-bold mb-1">College Connect</h1>
+      <p class="text-lg">KKWIEER's Community Platform to Connect Students and Faculty</p>
     </div>
   </header>
 
+  <!-- Blog / Introduction Section -->
+  <section class="max-w-4xl mx-auto px-4 mb-10">
+    <div class="bg-white p-6 rounded shadow-lg border-l-4 border-indigo-500">
+      <h2 class="text-2xl font-semibold mb-3 text-indigo-700">About College Connect</h2>
+      <p class="text-gray-700 text-md leading-relaxed">
+        College Connect is a collaborative platform created exclusively for the students and faculty members of <strong>KKWIEER</strong>. 
+        Our goal is to foster better communication, discovery, and collaboration within our academic community.
+        <br/><br/>
+        Students can create rich profiles highlighting their interests, expertise, and academic background, while faculty members can showcase their research fields, departmental roles, and areas of specialization.
+        <br/><br/>
+        With built-in search, branch filtering, and personalized login, College Connect helps you explore your peers, discover common interests, and build meaningful connections — whether you're looking for project collaborators, mentors, or simply to know more about your college community.
+        <br/><br/>
+        Welcome to a smarter, more connected KKWIEER!
+      </p>
+    </div>
+  </section>
+
+  <!-- Login -->
   <main class="max-w-4xl mx-auto px-4">
-    <!-- Login -->
     <div id="loginSection" class="bg-white p-6 rounded shadow mb-6">
       <h2 class="text-2xl font-semibold mb-4">Login</h2>
       <input id="loginName" placeholder="Enter Full Name (e.g., John Michael Doe)" class="border p-2 rounded w-full mb-2"/>
@@ -62,9 +79,10 @@
 
     <!-- Profiles List -->
     <h2 class="text-xl font-semibold mb-2">All Profiles</h2>
-    <div id="profiles" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    <div id="profiles" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10"></div>
   </main>
 
+  <!-- JavaScript Logic -->
   <script>
     const loginNameInput = document.getElementById("loginName");
     const userTypeSelect = document.getElementById("userType");
@@ -221,6 +239,5 @@
       }
     }
   </script>
-
 </body>
 </html>
