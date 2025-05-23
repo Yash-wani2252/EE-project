@@ -37,7 +37,7 @@
   <main class="max-w-4xl mx-auto px-4">
     <div id="loginSection" class="bg-white p-6 rounded shadow mb-6">
       <h2 class="text-2xl font-semibold mb-4">Login</h2>
-      <input id="loginName" placeholder="Enter Full Name (e.g., John Michael Doe)" class="border p-2 rounded w-full mb-2"/>
+      <input id="loginName" placeholder="Enter Full Name" class="border p-2 rounded w-full mb-2"/>
       <select id="userType" class="border p-2 rounded w-full mb-2">
         <option value="student">Student</option>
         <option value="staff">Staff</option>
@@ -54,10 +54,11 @@
         <input id="division" placeholder="Division" class="border p-2 rounded" required/>
         <input id="roll" placeholder="Roll Number" class="border p-2 rounded" required/>
         <input id="contact" placeholder="Contact Number" class="border p-2 rounded" required/>
-        <input id="branch" placeholder="Branch (Civil/Computer Engineering)" class="border p-2 rounded" required/>
+        <input id="branch" placeholder="Branch" class="border p-2 rounded" required/>
         <input id="interests" placeholder="Interests (comma separated)" class="border p-2 rounded" required/>
         <input id="expertise" placeholder="Expertise" class="border p-2 rounded" required/>
         <input id="experience" placeholder="Experience" class="border p-2 rounded" required/>
+        <input id="photo" placeholder="Profile Photo URL" class="border p-2 rounded"/>
       </div>
 
       <div id="staffFields" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
@@ -66,6 +67,7 @@
         <input id="location" placeholder="Sitting Location" class="border p-2 rounded" required/>
         <input id="staffBranch" placeholder="Department" class="border p-2 rounded" required/>
         <input id="staffContact" placeholder="Phone Number" class="border p-2 rounded" required/>
+        <input id="staffPhoto" placeholder="Profile Photo URL" class="border p-2 rounded"/>
       </div>
 
       <div class="mt-4 flex gap-2">
@@ -82,9 +84,8 @@
     <div id="profiles" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10"></div>
   </main>
 
-  <!-- JavaScript Logic -->
+  <!-- JavaScript -->
   <script>
-    // Initialize DOM elements
     const loginNameInput = document.getElementById("loginName");
     const userTypeSelect = document.getElementById("userType");
     const profileForm = document.getElementById("profileForm");
@@ -93,27 +94,9 @@
     const searchInput = document.getElementById("search");
     const profilesContainer = document.getElementById("profiles");
 
-    // Get data from localStorage with debug logging
-    let currentUser = null;
-    let users = [];
-    
-    try {
-      const storedUser = localStorage.getItem("currentUser");
-      const storedUsers = localStorage.getItem("users");
-      
-      console.log("Retrieved from localStorage - currentUser:", storedUser);
-      console.log("Retrieved from localStorage - users:", storedUsers);
-      
-      currentUser = storedUser ? JSON.parse(storedUser) : null;
-      users = storedUsers ? JSON.parse(storedUsers) : [];
-    } catch (error) {
-      console.error("Error loading data from localStorage:", error);
-      // Reset to defaults if there's an error
-      currentUser = null;
-      users = [];
-    }
+    let currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
+    let users = JSON.parse(localStorage.getItem("users")) || [];
 
-    // Check if user is logged in and set up UI accordingly
     if (currentUser) {
       document.getElementById("loginSection").style.display = "none";
       profileForm.classList.remove("hidden");
@@ -122,16 +105,10 @@
       renderProfiles();
     }
 
-    // Login function
     function loginUser() {
       const name = loginNameInput.value.trim();
       const type = userTypeSelect.value;
-
-      if (!name || (type === "student" && name.split(" ").length < 3)) {
-        alert("Please enter your full name in 'Name Father's Name Surname' format.");
-        return;
-      }
-
+      if (!name) return alert("Please enter full name.");
       currentUser = { name, type };
       localStorage.setItem("currentUser", JSON.stringify(currentUser));
       document.getElementById("loginSection").style.display = "none";
@@ -141,24 +118,20 @@
       renderProfiles();
     }
 
-    // Logout function
     function logoutUser() {
       localStorage.removeItem("currentUser");
       location.reload();
     }
 
-    // Show appropriate form fields based on user type
     function showFormFields(type) {
       studentFields.classList.toggle("hidden", type !== "student");
       staffFields.classList.toggle("hidden", type !== "staff");
     }
 
-    // Fill the form with existing user data
     function populateForm() {
       const u = users.find(u => u.name === currentUser.name);
       if (!u) return;
-
-      if (currentUser.type === "student") {
+      if (u.type === "student") {
         document.getElementById("father").value = u.father || "";
         document.getElementById("mother").value = u.mother || "";
         document.getElementById("year").value = u.year || "";
@@ -166,36 +139,25 @@
         document.getElementById("roll").value = u.roll || "";
         document.getElementById("contact").value = u.contact || "";
         document.getElementById("branch").value = u.branch || "";
-        document.getElementById("interests").value = u.interests ? u.interests.join(", ") : "";
+        document.getElementById("interests").value = (u.interests || []).join(", ");
         document.getElementById("expertise").value = u.expertise || "";
         document.getElementById("experience").value = u.experience || "";
+        document.getElementById("photo").value = u.photo || "";
       } else {
         document.getElementById("staffExpertise").value = u.expertise || "";
         document.getElementById("research").value = u.research || "";
         document.getElementById("location").value = u.location || "";
         document.getElementById("staffBranch").value = u.branch || "";
         document.getElementById("staffContact").value = u.contact || "";
+        document.getElementById("staffPhoto").value = u.photo || "";
       }
     }
 
-    // Handle profile form submission
-    profileForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      saveProfile();
-    });
-
-    // Save profile data - Fixed to ensure data is properly saved to localStorage
     function saveProfile() {
-      if (!currentUser) {
-        alert("You must be logged in to save a profile!");
-        return;
-      }
-      
+      if (!currentUser) return;
       const type = currentUser.type;
       let user = { name: currentUser.name, type };
-
       if (type === "student") {
-        // Collect all student field values
         user.father = document.getElementById("father").value || "";
         user.mother = document.getElementById("mother").value || "";
         user.year = document.getElementById("year").value || "";
@@ -203,87 +165,71 @@
         user.roll = document.getElementById("roll").value || "";
         user.contact = document.getElementById("contact").value || "";
         user.branch = document.getElementById("branch").value || "";
-        
-        // Process interests as an array
-        const interestsString = document.getElementById("interests").value || "";
-        user.interests = interestsString.toLowerCase().split(",").map(i => i.trim()).filter(i => i);
-        
+        user.interests = document.getElementById("interests").value.split(",").map(i => i.trim()).filter(i => i);
         user.expertise = document.getElementById("expertise").value || "";
         user.experience = document.getElementById("experience").value || "";
+        user.photo = document.getElementById("photo").value || "";
       } else {
-        // Collect all staff field values
         user.expertise = document.getElementById("staffExpertise").value || "";
         user.research = document.getElementById("research").value || "";
         user.location = document.getElementById("location").value || "";
         user.branch = document.getElementById("staffBranch").value || "";
         user.contact = document.getElementById("staffContact").value || "";
+        user.photo = document.getElementById("staffPhoto").value || "";
       }
-
-      // Find and update or add user
       const index = users.findIndex(u => u.name === currentUser.name);
-      console.log("Updating user index:", index, "with data:", JSON.stringify(user));
-      
-      if (index >= 0) {
-        users[index] = user;
-      } else {
-        users.push(user);
-      }
-
-      // Save to localStorage
+      if (index >= 0) users[index] = user;
+      else users.push(user);
       localStorage.setItem("users", JSON.stringify(users));
-      
-      // Debug log to verify data is being saved
-      console.log("Profile saved to localStorage:", JSON.stringify(users));
-      
       renderProfiles();
       alert("Profile saved successfully!");
     }
 
-    // Render all profiles based on search
     function renderProfiles() {
       const search = searchInput.value.toLowerCase();
       profilesContainer.innerHTML = "";
-
-      const filteredUsers = users.filter(u => 
-        u.name.toLowerCase().includes(search) || 
-        (u.interests && u.interests.some(interest => interest.toLowerCase().includes(search)))
-      );
-
-      filteredUsers.forEach(u => {
+      users.filter(u =>
+        u.name.toLowerCase().includes(search) ||
+        (u.interests && u.interests.some(i => i.toLowerCase().includes(search)))
+      ).forEach(u => {
         const card = document.createElement("div");
-        card.className = `p-4 rounded shadow ${u.type === 'staff' ? 'bg-yellow-100' : 'bg-white'}`;
-        
-        card.innerHTML = `
-          <h3 class="text-lg font-bold">${u.name}</h3>
-          ${u.type === "student" ? `
-            <p><strong>Year:</strong> ${u.year || ''}</p>
-            <p><strong>Division:</strong> ${u.division || ''}</p>
-            <p><strong>Roll No:</strong> ${u.roll || ''}</p>
-            <p><strong>Contact:</strong> ${u.contact || ''}</p>
-            <p><strong>Branch:</strong> ${u.branch || ''}</p>
-            <p><strong>Interests:</strong> ${u.interests ? u.interests.join(', ') : ''}</p>
-            <p><strong>Expertise:</strong> ${u.expertise || ''}</p>
-            <p><strong>Experience:</strong> ${u.experience || ''}</p>
-          ` : `
-            <p><strong>Department:</strong> ${u.branch || ''}</p>
-            <p><strong>Expertise:</strong> ${u.expertise || ''}</p>
-            <p><strong>Research:</strong> ${u.research || ''}</p>
-            <p><strong>Location:</strong> ${u.location || ''}</p>
-            <p><strong>Contact:</strong> ${u.contact || ''}</p>
-          `}
-          <div class="mt-2 flex gap-2">
-            <button onclick="editProfile('${u.name}')" class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Edit</button>
-            <button onclick="deleteProfile('${u.name}')" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Delete</button>
+        card.className = "p-4 rounded shadow bg-white flex gap-4 items-start";
+        const img = u.photo ? `<img src="${u.photo}" class="w-20 h-20 rounded-full object-cover"/>` : '';
+        let content = `
+          <div>${img}</div>
+          <div>
+            <h3 class="text-lg font-bold">${u.name}</h3>
+            ${u.type === "student" ? `
+              <p><strong>Year:</strong> ${u.year}</p>
+              <p><strong>Division:</strong> ${u.division}</p>
+              <p><strong>Roll:</strong> ${u.roll}</p>
+              <p><strong>Branch:</strong> ${u.branch}</p>
+              <p><strong>Contact:</strong> ${u.contact}</p>
+              <p><strong>Interests:</strong> ${(u.interests || []).join(", ")}</p>
+              <p><strong>Expertise:</strong> ${u.expertise}</p>
+              <p><strong>Experience:</strong> ${u.experience}</p>
+            ` : `
+              <p><strong>Department:</strong> ${u.branch}</p>
+              <p><strong>Expertise:</strong> ${u.expertise}</p>
+              <p><strong>Research:</strong> ${u.research}</p>
+              <p><strong>Location:</strong> ${u.location}</p>
+              <p><strong>Contact:</strong> ${u.contact}</p>
+            `}
+            ${currentUser && currentUser.name === u.name ? `
+              <div class="mt-2 flex gap-2">
+                <button onclick="editProfile('${u.name}')" class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Edit</button>
+                <button onclick="deleteProfile('${u.name}')" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Delete</button>
+              </div>` : ''}
           </div>
         `;
+        card.innerHTML = content;
         profilesContainer.appendChild(card);
       });
     }
 
-    // Edit a profile
     function editProfile(name) {
       const user = users.find(u => u.name === name);
-      if (user) {
+      if (user && user.name === currentUser.name) {
         currentUser = { name, type: user.type };
         localStorage.setItem("currentUser", JSON.stringify(currentUser));
         document.getElementById("loginSection").style.display = "none";
@@ -293,22 +239,14 @@
       }
     }
 
-    // Delete a profile
     function deleteProfile(name) {
-      if (confirm("Are you sure you want to delete this profile?")) {
+      if (currentUser && currentUser.name === name && confirm("Are you sure?")) {
         users = users.filter(u => u.name !== name);
         localStorage.setItem("users", JSON.stringify(users));
-        
-        // If deleting current user, log out
-        if (currentUser && currentUser.name === name) {
-          logoutUser();
-        } else {
-          renderProfiles();
-        }
+        logoutUser();
       }
     }
 
-    // Initialize the profiles display
     renderProfiles();
   </script>
 </body>
