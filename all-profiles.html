@@ -1,0 +1,83 @@
+<!-- all-profiles.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>All Profiles</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <h2>All Profiles</h2>
+      <button class="btn btn-outline-danger btn-sm" onclick="logout()">Logout</button>
+    </div>
+    <div class="row mt-3" id="profilesContainer">
+
+      <!-- Student Card -->
+      <div class="col-md-6 mb-4">
+        <div class="p-3 rounded shadow bg-light">
+          <div class="d-flex align-items-start mb-2">
+            <img src="https://drive.google.com/uc?export=view&id=1a71a0b9-0d60-4cb3-8bc6-d9133fc3e826"
+                 alt="Profile Photo"
+                 class="rounded-circle me-3"
+                 width="60"
+                 height="60"
+                 onerror="this.style.display='none'">
+            <div>
+              <h5 class="mb-0">Yash Hemantkumar Wani</h5>
+              <small>Civil Engineering</small>
+            </div>
+          </div>
+          <p><strong>Year:</strong> FY</p>
+          <p><strong>Division:</strong> J</p>
+          <p><strong>Roll:</strong> 69</p>
+          <p><strong>Contact:</strong> 9321073031</p>
+          <p><strong>Interests:</strong> python, tech savvy, art, formula 1</p>
+          <p><strong>Expertise:</strong> coding</p>
+          <p><strong>Experience:</strong> 2 years of python coding experience</p>
+          <button class="btn btn-primary btn-sm">Edit</button>
+          <button class="btn btn-danger btn-sm ms-2">Delete</button>
+        </div>
+      </div>
+
+      <!-- Staff Card -->
+      <div class="col-md-6 mb-4">
+        <div class="p-3 rounded shadow staff-card">
+          <div class="d-flex align-items-start mb-2">
+            <img src="https://drive.google.com/uc?export=view&id=1a71a0b9-0d60-4cb3-8bc6-d9133fc3e826"
+                 alt="Profile Photo"
+                 class="rounded-circle me-3"
+                 width="60"
+                 height="60"
+                 onerror="this.style.display='none'">
+            <div>
+              <h5 class="mb-0">Snehal Chaudhari</h5>
+              <small>Civil Engineering Department</small>
+            </div>
+          </div>
+          <p><strong>Department:</strong> Civil Engineering</p>
+          <p><strong>Expertise:</strong> Civil Engineering</p>
+          <p><strong>Research:</strong> Town planning</p>
+          <p><strong>Location:</strong> first floor staff room, civil dept</p>
+          <p><strong>Contact:</strong> 94226 27934</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Only allow access if logged in
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+      window.location.href = "login.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("isLoggedIn");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>
