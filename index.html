@@ -84,6 +84,17 @@
       <h2 class="text-xl font-semibold mb-2">All Profiles</h2>
       <div id="profiles" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10"></div>
     </div>
+
+    <!-- Profile Detail Modal -->
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold">Profile Details</h3>
+          <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
+        <div id="modalContent"></div>
+      </div>
+    </div>
   </main>
 
   <!-- JavaScript Logic -->
@@ -99,6 +110,8 @@
     const loginSection = document.getElementById("loginSection");
     const searchSection = document.getElementById("searchSection");
     const profilesSection = document.getElementById("profilesSection");
+    const profileModal = document.getElementById("profileModal");
+    const modalContent = document.getElementById("modalContent");
 
     // Data storage (using in-memory storage instead of localStorage for artifacts)
     let currentUser = null;
@@ -260,7 +273,10 @@
 
       filteredUsers.forEach(u => {
         const card = document.createElement("div");
-        card.className = `p-4 rounded shadow ${u.type === 'staff' ? 'bg-yellow-100' : 'bg-white'}`;
+        // Updated colors: light blue for students, light green for staff
+        card.className = `p-4 rounded shadow ${u.type === 'staff' ? 'bg-green-100' : 'bg-blue-100'}`;
+        
+        const isCurrentUser = currentUser && currentUser.name === u.name;
         
         card.innerHTML = `
           <h3 class="text-lg font-bold">${u.name}</h3>
@@ -268,7 +284,7 @@
             <p><strong>Year:</strong> ${u.year || ''}</p>
             <p><strong>Division:</strong> ${u.division || ''}</p>
             <p><strong>Roll No:</strong> ${u.roll || ''}</p>
-            <p><strong>Contact:</strong> ${u.contact || ''}</p>
+            <p><strong>Contact:</strong> ${u.contact ? '***-***-****' : ''}</p>
             <p><strong>Branch:</strong> ${u.branch || ''}</p>
             <p><strong>Interests:</strong> ${u.interests ? u.interests.join(', ') : ''}</p>
             <p><strong>Expertise:</strong> ${u.expertise || ''}</p>
@@ -278,16 +294,69 @@
             <p><strong>Expertise:</strong> ${u.expertise || ''}</p>
             <p><strong>Research:</strong> ${u.research || ''}</p>
             <p><strong>Location:</strong> ${u.location || ''}</p>
-            <p><strong>Contact:</strong> ${u.contact || ''}</p>
+            <p><strong>Contact:</strong> ${u.contact ? '***-***-****' : ''}</p>
           `}
           <div class="mt-2 flex gap-2">
-            <button onclick="editProfile('${u.name}')" class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Edit</button>
-            <button onclick="deleteProfile('${u.name}')" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Delete</button>
+            <button onclick="connectProfile('${u.name}')" class="bg-purple-500 text-white px-2 py-1 rounded text-sm hover:bg-purple-600">Connect</button>
+            ${isCurrentUser ? `
+              <button onclick="editProfile('${u.name}')" class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Edit</button>
+              <button onclick="deleteProfile('${u.name}')" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Delete</button>
+            ` : ''}
           </div>
         `;
         profilesContainer.appendChild(card);
       });
     }
+
+    // Connect to a profile - Opens modal with full details
+    function connectProfile(name) {
+      const user = users.find(u => u.name === name);
+      if (!user) return;
+
+      modalContent.innerHTML = `
+        <div class="space-y-3">
+          <h4 class="text-lg font-bold text-center">${user.name}</h4>
+          <div class="border-t pt-3">
+            ${user.type === "student" ? `
+              <p><strong>Type:</strong> Student</p>
+              <p><strong>Father's Name:</strong> ${user.father || 'Not provided'}</p>
+              <p><strong>Mother's Name:</strong> ${user.mother || 'Not provided'}</p>
+              <p><strong>Year:</strong> ${user.year || 'Not provided'}</p>
+              <p><strong>Division:</strong> ${user.division || 'Not provided'}</p>
+              <p><strong>Roll No:</strong> ${user.roll || 'Not provided'}</p>
+              <p><strong>Contact:</strong> ${user.contact || 'Not provided'}</p>
+              <p><strong>Branch:</strong> ${user.branch || 'Not provided'}</p>
+              <p><strong>Interests:</strong> ${user.interests ? user.interests.join(', ') : 'Not provided'}</p>
+              <p><strong>Expertise:</strong> ${user.expertise || 'Not provided'}</p>
+              <p><strong>Experience:</strong> ${user.experience || 'Not provided'}</p>
+            ` : `
+              <p><strong>Type:</strong> Staff</p>
+              <p><strong>Department:</strong> ${user.branch || 'Not provided'}</p>
+              <p><strong>Expertise:</strong> ${user.expertise || 'Not provided'}</p>
+              <p><strong>Research:</strong> ${user.research || 'Not provided'}</p>
+              <p><strong>Location:</strong> ${user.location || 'Not provided'}</p>
+              <p><strong>Contact:</strong> ${user.contact || 'Not provided'}</p>
+            `}
+          </div>
+        </div>
+      `;
+      
+      profileModal.classList.remove("hidden");
+      profileModal.classList.add("flex");
+    }
+
+    // Close modal
+    function closeModal() {
+      profileModal.classList.add("hidden");
+      profileModal.classList.remove("flex");
+    }
+
+    // Close modal when clicking outside
+    profileModal.addEventListener('click', function(e) {
+      if (e.target === profileModal) {
+        closeModal();
+      }
+    });
 
     // Edit a profile
     function editProfile(name) {
