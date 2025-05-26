@@ -171,9 +171,27 @@
     const profileModal = document.getElementById("profileModal");
     const modalContent = document.getElementById("modalContent");
 
-    // Data storage (using in-memory storage instead of localStorage for artifacts)
+    // Data storage
     let currentUser = null;
     let users = [];
+
+    // Load users from localStorage on page load
+    function loadUsersFromStorage() {
+      const storedUsers = localStorage.getItem('collegeConnectUsers');
+      if (storedUsers) {
+        users = JSON.parse(storedUsers);
+      } else {
+        users = [];
+      }
+      console.log("Loaded users from localStorage:", users);
+      renderProfiles();
+    }
+
+    // Save users to localStorage
+    function saveUsersToStorage() {
+      localStorage.setItem('collegeConnectUsers', JSON.stringify(users));
+      console.log("Saved users to localStorage:", users);
+    }
 
     // Login function
     function loginUser() {
@@ -303,6 +321,9 @@
         users.push(user);
       }
       
+      // Save to localStorage
+      saveUsersToStorage();
+      
       console.log("Profile saved:", user);
       renderProfiles();
       alert("Profile saved successfully!");
@@ -347,7 +368,7 @@
             <button onclick="connectProfile('${u.name}')" class="bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium btn-hover">Connect</button>
             ${isCurrentUser ? `
               <button onclick="editProfile('${u.name}')" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium btn-hover">Edit</button>
-              <button onclickmeal("deleteProfile('${u.name}')") class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium btn-hover">Delete</button>
+              <button onclick="deleteProfile('${u.name}')" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium btn-hover">Delete</button>
             ` : ''}
           </div>
         `;
@@ -424,6 +445,9 @@
       if (confirm("Are you sure you want to delete this profile?")) {
         users = users.filter(u => u.name !== name);
         
+        // Save updated users to localStorage
+        saveUsersToStorage();
+        
         if (currentUser && currentUser.name === name) {
           logoutUser();
         } else {
@@ -432,7 +456,8 @@
       }
     }
 
-    // Initialize
+    // Initialize - Load users from localStorage
+    loadUsersFromStorage();
     console.log("App initialized");
   </script>
 </body>
