@@ -74,12 +74,16 @@
       </div>
     </form>
 
-    <!-- Search -->
-    <input oninput="renderProfiles()" id="search" placeholder="Search by name or interest..." class="border p-2 rounded w-full mb-4"/>
+    <!-- Search - Hidden by default -->
+    <div id="searchSection" class="hidden">
+      <input oninput="renderProfiles()" id="search" placeholder="Search by name or interest..." class="border p-2 rounded w-full mb-4"/>
+    </div>
 
-    <!-- Profiles List -->
-    <h2 class="text-xl font-semibold mb-2">All Profiles</h2>
-    <div id="profiles" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10"></div>
+    <!-- Profiles List - Hidden by default -->
+    <div id="profilesSection" class="hidden">
+      <h2 class="text-xl font-semibold mb-2">All Profiles</h2>
+      <div id="profiles" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10"></div>
+    </div>
   </main>
 
   <!-- JavaScript Logic -->
@@ -92,69 +96,81 @@
     const staffFields = document.getElementById("staffFields");
     const searchInput = document.getElementById("search");
     const profilesContainer = document.getElementById("profiles");
+    const loginSection = document.getElementById("loginSection");
+    const searchSection = document.getElementById("searchSection");
+    const profilesSection = document.getElementById("profilesSection");
 
-    // Get data from localStorage with debug logging
+    // Data storage (using in-memory storage instead of localStorage for artifacts)
     let currentUser = null;
     let users = [];
-    
-    try {
-      const storedUser = localStorage.getItem("currentUser");
-      const storedUsers = localStorage.getItem("users");
-      
-      console.log("Retrieved from localStorage - currentUser:", storedUser);
-      console.log("Retrieved from localStorage - users:", storedUsers);
-      
-      currentUser = storedUser ? JSON.parse(storedUser) : null;
-      users = storedUsers ? JSON.parse(storedUsers) : [];
-    } catch (error) {
-      console.error("Error loading data from localStorage:", error);
-      // Reset to defaults if there's an error
-      currentUser = null;
-      users = [];
-    }
 
-    // Check if user is logged in and set up UI accordingly
-    if (currentUser) {
-      document.getElementById("loginSection").style.display = "none";
-      profileForm.classList.remove("hidden");
-      showFormFields(currentUser.type);
-      populateForm();
-      renderProfiles();
-    }
-
-    // Login function
+    // Login function - Fixed
     function loginUser() {
       const name = loginNameInput.value.trim();
       const type = userTypeSelect.value;
 
-      if (!name || (type === "student" && name.split(" ").length < 3)) {
+      console.log("Login attempt:", { name, type }); // Debug log
+
+      if (!name) {
+        alert("Please enter your full name.");
+        return;
+      }
+
+      if (type === "student" && name.split(" ").length < 3) {
         alert("Please enter your full name in 'Name Father's Name Surname' format.");
         return;
       }
 
       currentUser = { name, type };
-      localStorage.setItem("currentUser", JSON.stringify(currentUser));
-      document.getElementById("loginSection").style.display = "none";
+      console.log("User logged in:", currentUser); // Debug log
+      
+      // Hide login section and show profile form and other sections
+      loginSection.style.display = "none";
       profileForm.classList.remove("hidden");
+      searchSection.classList.remove("hidden");
+      profilesSection.classList.remove("hidden");
+      
       showFormFields(type);
       populateForm();
       renderProfiles();
     }
 
-    // Logout function
+    // Logout function - Fixed
     function logoutUser() {
-      localStorage.removeItem("currentUser");
-      location.reload();
+      currentUser = null;
+      
+      // Show login section and hide other sections
+      loginSection.style.display = "block";
+      profileForm.classList.add("hidden");
+      searchSection.classList.add("hidden");
+      profilesSection.classList.add("hidden");
+      
+      // Clear form fields
+      profileForm.reset();
+      searchInput.value = "";
+      
+      // Clear login fields
+      loginNameInput.value = "";
+      userTypeSelect.value = "student";
+      
+      console.log("User logged out");
     }
 
     // Show appropriate form fields based on user type
     function showFormFields(type) {
-      studentFields.classList.toggle("hidden", type !== "student");
-      staffFields.classList.toggle("hidden", type !== "staff");
+      if (type === "student") {
+        studentFields.classList.remove("hidden");
+        staffFields.classList.add("hidden");
+      } else {
+        studentFields.classList.add("hidden");
+        staffFields.classList.remove("hidden");
+      }
     }
 
     // Fill the form with existing user data
     function populateForm() {
+      if (!currentUser) return;
+      
       const u = users.find(u => u.name === currentUser.name);
       if (!u) return;
 
@@ -184,7 +200,7 @@
       saveProfile();
     });
 
-    // Save profile data - Fixed to ensure data is properly saved to localStorage
+    // Save profile data
     function saveProfile() {
       if (!currentUser) {
         alert("You must be logged in to save a profile!");
@@ -220,21 +236,14 @@
       }
 
       // Find and update or add user
-      const index = users.findIndex(u => u.name === currentUser.name);
-      console.log("Updating user index:", index, "with data:", JSON.stringify(user));
-      
+      const index = users.findIndex(u => u.name === currentUser.name);      
       if (index >= 0) {
         users[index] = user;
       } else {
         users.push(user);
       }
-
-      // Save to localStorage
-      localStorage.setItem("users", JSON.stringify(users));
       
-      // Debug log to verify data is being saved
-      console.log("Profile saved to localStorage:", JSON.stringify(users));
-      
+      console.log("Profile saved:", user); // Debug log
       renderProfiles();
       alert("Profile saved successfully!");
     }
@@ -251,7 +260,7 @@
 
       filteredUsers.forEach(u => {
         const card = document.createElement("div");
-        card.className = p-4 rounded shadow ${u.type === 'staff' ? 'bg-yellow-100' : 'bg-white'};
+        card.className = `p-4 rounded shadow ${u.type === 'staff' ? 'bg-yellow-100' : 'bg-white'}`;
         
         card.innerHTML = `
           <h3 class="text-lg font-bold">${u.name}</h3>
@@ -285,9 +294,10 @@
       const user = users.find(u => u.name === name);
       if (user) {
         currentUser = { name, type: user.type };
-        localStorage.setItem("currentUser", JSON.stringify(currentUser));
-        document.getElementById("loginSection").style.display = "none";
+        loginSection.style.display = "none";
         profileForm.classList.remove("hidden");
+        searchSection.classList.remove("hidden");
+        profilesSection.classList.remove("hidden");
         showFormFields(user.type);
         populateForm();
       }
@@ -297,7 +307,6 @@
     function deleteProfile(name) {
       if (confirm("Are you sure you want to delete this profile?")) {
         users = users.filter(u => u.name !== name);
-        localStorage.setItem("users", JSON.stringify(users));
         
         // If deleting current user, log out
         if (currentUser && currentUser.name === name) {
@@ -308,9 +317,8 @@
       }
     }
 
-    // Initialize the profiles display
-    renderProfiles();
+    // Initialize - Only show login section by default
+    console.log("App initialized");
   </script>
 </body>
 </html>
-
