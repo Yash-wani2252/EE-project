@@ -273,8 +273,8 @@
 
       filteredUsers.forEach(u => {
         const card = document.createElement("div");
-        // Updated colors: light blue for students, light green for staff
-        card.className = `p-4 rounded shadow ${u.type === 'staff' ? 'bg-green-100' : 'bg-blue-100'}`;
+        // Updated colors: vibrant blue for students, vibrant green for staff
+        card.className = `p-4 rounded shadow ${u.type === 'staff' ? 'bg-green-200 border-l-4 border-green-500' : 'bg-blue-200 border-l-4 border-blue-500'}`;
         
         const isCurrentUser = currentUser && currentUser.name === u.name;
         
