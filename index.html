@@ -71,7 +71,7 @@
       </div>
 
       <div class="mt-4 flex gap-2">
-        <button id="saveButton" type="button" onclick="saveProfile()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Profile</button>
+        <button type="button" onclick="saveProfile()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Profile</button>
         <button type="button" onclick="logoutUser()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
       </div>
     </form>
@@ -84,7 +84,7 @@
     <div id="profiles" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10"></div>
   </main>
 
-  <!-- JavaScript -->
+  <!-- Script -->
   <script>
     const loginNameInput = document.getElementById("loginName");
     const userTypeSelect = document.getElementById("userType");
@@ -193,7 +193,8 @@
         (u.interests && u.interests.some(i => i.toLowerCase().includes(search)))
       ).forEach(u => {
         const card = document.createElement("div");
-        card.className = "p-4 rounded shadow bg-white flex gap-4 items-start";
+        const cardColor = u.type === "staff" ? "bg-yellow-100" : "bg-white";
+        card.className = `p-4 rounded shadow ${cardColor} flex gap-4 items-start`;
         const img = u.photo ? `<img src="${u.photo}" class="w-20 h-20 rounded-full object-cover"/>` : '';
         let content = `
           <div>${img}</div>
@@ -240,7 +241,7 @@
     }
 
     function deleteProfile(name) {
-      if (currentUser && currentUser.name === name && confirm("Are you sure?")) {
+      if (currentUser && currentUser.name === name && confirm("Are you sure you want to delete your profile?")) {
         users = users.filter(u => u.name !== name);
         localStorage.setItem("users", JSON.stringify(users));
         logoutUser();
